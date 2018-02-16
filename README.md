@@ -45,8 +45,8 @@ You should be all set!
 ### Resource "file"
 
 * `path` (required – type string): Path to the file to be created
-* `user` (optional – type string, default to current user): Directory owner user name (default: current user)
-* `group` (optional – type string, default to current primary group): Directory owner group name
+* `user` (optional – type string, default to current user): File owner user name (default: current user)
+* `group` (optional – type string, default to current primary group): File owner group name
 * `mode` (optional – type string, default `"0644"`): Permissions to apply to file (in octal representation, e.g. 0644)
 * `content` (optional – type string, default `""`): File content
 
