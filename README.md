@@ -37,7 +37,7 @@ You should be all set!
 ### Resource "directory"
 
 * `path` (required – type string): Path to the directory to be created
-* `user` (optional – type string, default to current user): Directory owner user name (default: current user)
+* `user` (optional – type string, default to current user): Directory owner user name
 * `group` (optional – type string, default to current primary group): Directory owner group name
 * `mode` (optional – type string, default `"0755"`): Permissions to apply to directory (in octal representation, e.g. 0755)
 * `create_parents` (optional – type bool, default `false`): Create parent directories as needed
@@ -45,7 +45,7 @@ You should be all set!
 ### Resource "file"
 
 * `path` (required – type string): Path to the file to be created
-* `user` (optional – type string, default to current user): File owner user name (default: current user)
+* `user` (optional – type string, default to current user): File owner user name
 * `group` (optional – type string, default to current primary group): File owner group name
 * `mode` (optional – type string, default `"0644"`): Permissions to apply to file (in octal representation, e.g. 0644)
 * `content` (optional – type string, default `""`): File content
