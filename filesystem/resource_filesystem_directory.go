@@ -24,12 +24,31 @@ func resourceDirectory() *schema.Resource {
 				Description: "Directory owner user name (default: current user)",
 				Optional:    true,
 				ForceNew:    false,
+				DefaultFunc: func() (interface{}, error) {
+					currentUser, err := user.Current()
+					if err != nil {
+						return nil, fmt.Errorf("unable to lookup current user name: %s", err)
+					}
+					return currentUser.Username, nil
+				},
 			},
 			"group": {
 				Type:        schema.TypeString,
 				Description: "Directory owner group name",
 				Optional:    true,
 				ForceNew:    false,
+				DefaultFunc: func() (interface{}, error) {
+					currentUser, err := user.Current()
+					if err != nil {
+						return nil, fmt.Errorf("unable to lookup current user name: %s", err)
+					}
+
+					currentGroup, err := user.LookupGroupId(currentUser.Gid)
+					if err != nil {
+						return nil, fmt.Errorf("unable to lookup current user group name: %s", err)
+					}
+					return currentGroup.Name, nil
+				},
 			},
 			"mode": {
 				Type:        schema.TypeString,
@@ -94,23 +113,6 @@ func resourceFilesystemDirectoryCreate(d *schema.ResourceData, meta interface{})
 		return err
 	}
 	d.Set("mode", fmt.Sprintf("%#o", dirInfo.Mode()))
-
-	// If neither user or group attributes are set, fallback to current user uid/gid
-	if d.Get("user").(string) == "" || d.Get("group").(string) == "" {
-		currentUser, err := user.Current()
-		if err != nil {
-			return fmt.Errorf("unable to lookup current user name: %s", err)
-		}
-		d.Set("user", currentUser.Username)
-
-		if d.Get("group").(string) == "" {
-			currentGroup, err := user.LookupGroupId(currentUser.Gid)
-			if err != nil {
-				return fmt.Errorf("unable to lookup current user group name: %s", err)
-			}
-			d.Set("group", currentGroup.Name)
-		}
-	}
 
 	u, err := user.Lookup(d.Get("user").(string))
 	if err != nil {
