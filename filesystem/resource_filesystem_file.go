@@ -169,10 +169,7 @@ func resourceFilesystemFileUpdate(d *schema.ResourceData, meta interface{}) erro
 	defer file.Close()
 
 	if d.HasChange("mode") {
-		fileMode, err := strconv.ParseUint(d.Get("mode").(string), 8, 32)
-		if err != nil {
-			return fmt.Errorf("invalid mode value: %s", err)
-		}
+		fileMode, _ := strconv.ParseUint(d.Get("mode").(string), 8, 32)
 
 		if err := file.Chmod(os.FileMode(fileMode)); err != nil {
 			return err

@@ -176,10 +176,7 @@ func resourceFilesystemDirectoryUpdate(d *schema.ResourceData, meta interface{})
 	defer dir.Close()
 
 	if d.HasChange("mode") {
-		dirMode, err := strconv.ParseUint(d.Get("mode").(string), 8, 32)
-		if err != nil {
-			return fmt.Errorf("invalid mode value: %s", err)
-		}
+		dirMode, _ := strconv.ParseUint(d.Get("mode").(string), 8, 32)
 
 		if err := dir.Chmod(os.FileMode(dirMode)); err != nil {
 			return err
