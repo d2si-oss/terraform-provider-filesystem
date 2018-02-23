@@ -38,21 +38,20 @@ func Provider() terraform.ResourceProvider {
 
 func config(d *schema.ResourceData) (interface{}, error) {
 	var (
-		p   filesystemProvider
-		err error
+		p            filesystemProvider
+		loggerConfig logger.FileConfig
+		err          error
 	)
 
 	if d.Get("debug").(bool) {
-		if p.log, err = logger.NewLogger(logger.FileConfig{
+		loggerConfig = logger.FileConfig{
 			Level: "debug",
 			Path:  providerLogFile,
-		}); err != nil {
-			return nil, fmt.Errorf("unable to init provider debug logger: %s", err)
 		}
-	} else {
-		if p.log, err = logger.NewLogger(); err != nil {
-			return nil, fmt.Errorf("unable to init provider debug logger: %s", err)
-		}
+	}
+
+	if p.log, err = logger.NewLogger(loggerConfig); err != nil {
+		return nil, fmt.Errorf("unable to init provider debug logger: %s", err)
 	}
 
 	return p, nil
