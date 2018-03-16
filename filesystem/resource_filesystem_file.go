@@ -25,31 +25,14 @@ func resourceFile() *schema.Resource {
 				Description: "File owner user name (default: current user)",
 				Optional:    true,
 				ForceNew:    false,
-				DefaultFunc: func() (interface{}, error) {
-					currentUser, err := user.Current()
-					if err != nil {
-						return nil, fmt.Errorf("unable to lookup current user name: %s", err)
-					}
-					return currentUser.Username, nil
-				},
+				DefaultFunc: getCurrentUsername,
 			},
 			"group": {
 				Type:        schema.TypeString,
-				Description: "File owner group name",
+				Description: "File owner group name (default: current user group)",
 				Optional:    true,
 				ForceNew:    false,
-				DefaultFunc: func() (interface{}, error) {
-					currentUser, err := user.Current()
-					if err != nil {
-						return nil, fmt.Errorf("unable to lookup current user name: %s", err)
-					}
-
-					currentGroup, err := user.LookupGroupId(currentUser.Gid)
-					if err != nil {
-						return nil, fmt.Errorf("unable to lookup current user group name: %s", err)
-					}
-					return currentGroup.Name, nil
-				},
+				DefaultFunc: getCurrentUserGroupname,
 			},
 			"mode": {
 				Type:        schema.TypeString,

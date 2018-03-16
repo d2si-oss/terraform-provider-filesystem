@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"os/user"
 
 	"github.com/facette/logger"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -55,6 +56,28 @@ func config(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	return p, nil
+}
+
+func getCurrentUsername() (interface{}, error) {
+	currentUser, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("unable to lookup current user name: %s", err)
+	}
+	return currentUser.Username, nil
+}
+
+func getCurrentUserGroupname() (interface{}, error) {
+	currentUser, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("unable to lookup current user name: %s", err)
+	}
+
+	currentGroup, err := user.LookupGroupId(currentUser.Gid)
+	if err != nil {
+		return "", fmt.Errorf("unable to lookup current user group name: %s", err)
+	}
+
+	return currentGroup.Name, nil
 }
 
 func hash(s string) string {
