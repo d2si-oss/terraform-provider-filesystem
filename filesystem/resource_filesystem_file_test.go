@@ -13,38 +13,46 @@ import (
 )
 
 func TestAccFilesystemFile(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		Providers: map[string]terraform.ResourceProvider{"filesystem": Provider()},
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Check: resource.ComposeAggregateTestCheckFunc(testFilesystemFileCreate),
-				Config: `
+	const (
+		fileCreateResource = `
 resource "filesystem_file" "test" {
   path = "/tmp/testfile"
   content = "blah"
   mode = "0600"
 }
-`,
-			},
-			resource.TestStep{
-				Check: resource.ComposeAggregateTestCheckFunc(testFilesystemFileUpdateMode),
-				Config: `
+`
+
+		fileUpdateModeResource = `
 resource "filesystem_file" "test" {
   path = "/tmp/testfile"
   content = "blah"
   mode = "0644"
 }
-`,
-			},
-			resource.TestStep{
-				Check: resource.ComposeAggregateTestCheckFunc(testFilesystemFileUpdateContent),
-				Config: `
+`
+
+		fileUpdateContentResource = `
 resource "filesystem_file" "test" {
   path = "/tmp/testfile"
   content = "yay"
   mode = "0644"
 }
-`,
+`
+	)
+
+	resource.Test(t, resource.TestCase{
+		Providers: map[string]terraform.ResourceProvider{"filesystem": Provider()},
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Check:  resource.ComposeAggregateTestCheckFunc(testFilesystemFileCreate),
+				Config: fileCreateResource,
+			},
+			resource.TestStep{
+				Check:  resource.ComposeAggregateTestCheckFunc(testFilesystemFileUpdateMode),
+				Config: fileUpdateModeResource,
+			},
+			resource.TestStep{
+				Check:  resource.ComposeAggregateTestCheckFunc(testFilesystemFileUpdateContent),
+				Config: fileUpdateContentResource,
 			},
 		},
 		CheckDestroy: testFilesystemFileDelete,

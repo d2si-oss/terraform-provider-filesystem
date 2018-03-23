@@ -13,37 +13,44 @@ import (
 )
 
 func TestAccFilesystemDirectory(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		Providers: map[string]terraform.ResourceProvider{"filesystem": Provider()},
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				PreConfig: func() { os.Remove("/tmp/test") },
-				Config: `
+	const (
+		directoryCreateNoparentsResource = `
 resource "filesystem_directory" "test" {
   path = "/tmp/test/testdir"
   mode = "0700"
-}
-`,
-				ExpectError: regexp.MustCompile("mkdir /tmp/test/testdir: no such file or directory"),
-			},
-			resource.TestStep{
-				Check: resource.ComposeAggregateTestCheckFunc(testFilesystemDirectoryCreateParents),
-				Config: `
+}`
+
+		directoryCreateParentsResource = `
 resource "filesystem_directory" "test" {
   path = "/tmp/test/testdir"
   mode = "0700"
   create_parents = true
 }
-`,
-			},
-			resource.TestStep{
-				Check: resource.ComposeAggregateTestCheckFunc(testFilesystemDirectoryUpdateMode),
-				Config: `
+`
+
+		directoryUpdateModeResource = `
 resource "filesystem_directory" "test" {
   path = "/tmp/test/testdir"
   mode = "0755"
 }
-`,
+`
+	)
+
+	resource.Test(t, resource.TestCase{
+		Providers: map[string]terraform.ResourceProvider{"filesystem": Provider()},
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				PreConfig:   func() { os.Remove("/tmp/test") },
+				Config:      directoryCreateNoparentsResource,
+				ExpectError: regexp.MustCompile("mkdir /tmp/test/testdir: no such file or directory"),
+			},
+			resource.TestStep{
+				Check:  resource.ComposeAggregateTestCheckFunc(testFilesystemDirectoryCreateParents),
+				Config: directoryCreateParentsResource,
+			},
+			resource.TestStep{
+				Check:  resource.ComposeAggregateTestCheckFunc(testFilesystemDirectoryUpdateMode),
+				Config: directoryUpdateModeResource,
 			},
 		},
 		CheckDestroy: testFilesystemDirectoryDelete,
